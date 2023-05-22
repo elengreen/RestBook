@@ -1,0 +1,11 @@
+.fav-header{
+    color: #440381;
+    font-size: 40px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.fav-wrapper{
+    max-width: 900px;
+    margin: auto;
+}

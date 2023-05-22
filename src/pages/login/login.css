@@ -1,0 +1,25 @@
+.container{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.centralcol{
+    min-width: 400px;
+}
+
+.registration{
+    margin-bottom: 60px;
+    text-transform: uppercase;
+    font-weight:300;
+    font-size: 60px;
+    color: #26408B;
+    text-align: center;
+
+}
+
+.restbook{
+    margin: 0 150px;
+}
