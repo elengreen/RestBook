@@ -11,3 +11,28 @@ body {
 a {
   text-decoration: none;
 }
+
+.main-header {
+  margin-bottom: 40px;
+  color: #440381;
+  font-size: 40px;
+  margin-top: 40px;
+}
+
+.main-wrapper {
+  width: fit-content;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 20px;
+  grid-gap: 50px;
+}
+
+.input-error{
+  color: red;
+}

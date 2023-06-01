@@ -11,13 +11,13 @@ const RestaurantDescription = () => {
             <section className="hero">
                 <h1 className="hero-header rest-header">Anchor & James</h1>
             </section>
-            <div className="fav-wrapper">
+            <div className="main-wrapper">
                 <div className="booking-info">
                     <span className='info-tables'>Свободно столов: <span className='cards-results'>5</span></span>
                     <span>Рейтинг: <span className='card-rating'>4.6</span></span>
                     <Button className='mt-4' size='lg'>Забронировать</Button>    
                 </div>
-                <h2 className='fav-header'>Описание</h2>
+                <h2 className='main-header'>Описание</h2>
                 <p>
                     Lörem ipsum dohinat hir syst mire pararäktig. Tinade pongen tinyrat, kator. Anagen båhet. Teck stenov. Ost krong orostelefon: ted. Syktig ekaheten innan reng i speman än kåkåbelt. Kande ism. Ultrabel omugt sakågisk. E-learning säg. Sön sal det vill säga korägen. Nipösm mon, instegsjobb kontraras. Kasydat neren det vill säga diling. Besesk antingen, men mesylig utan resaska. Tetraligt semiskop. Ode bölingar tipp buv nor.
                     <br /><br />
@@ -27,7 +27,7 @@ const RestaurantDescription = () => {
                     Spess eruska förarstödjare. Mikrong remagon eftersom min den musär.
                     Nidat ponera för robothandel huruvida deng. Homoda hoktigt i tvåkönsnorm, och spest nyvis. Kanar kärlekslås som penade, ett rende. Sask norade. Infraren sesk. Semilid tetrare lack.
                 </p>
-                <h2 className='fav-header'>Контакты</h2>
+                <h2 className='main-header'>Контакты</h2>
                 <div className="description-contacts">
                     <div className="contacts-field">
                         <Image src={phone}></Image>
