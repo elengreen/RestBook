@@ -7,6 +7,7 @@ import RestaurantCard from '../../components/restaurant-card/restaurant-card';
 import { useGetListQuery } from './restaurantListApiSlice.js'
 
 import search from '../../shared/search.svg'
+import { useGetFavouritesQuery } from '../favourites/favouritesApiSlice';
 
 
 
@@ -17,11 +18,18 @@ const RestaurantList = () => {
         data: restaurants = [],
     } = useGetListQuery();
 
-    console.log(restaurants);
+    const {
+        data: favourites = [],
+    } = useGetFavouritesQuery();
 
-    const restCards = restaurants.map(({ id, ...restaurant }) => {
+    const restCards = restaurants.map(({ ...restaurant }) => {
+        let isFav;
+        if (favourites.find(f => f.id === restaurant.id))
+            isFav = true;
+        else
+            isFav = false;
         return (
-            <RestaurantCard {...restaurant} />
+            <RestaurantCard key={restaurant.id} {...restaurant} isFavourite={isFav} />
         )
     })
 
@@ -50,7 +58,7 @@ const RestaurantList = () => {
                             <option>По убыванию рейтинга</option>
                             <option value="1">По возрастанию рейтинга</option>
                         </Form.Select>
-                        
+
                     </div>
                 </div>
                 <div className="cards-container">

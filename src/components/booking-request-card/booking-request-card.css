@@ -29,3 +29,12 @@
 .book-card-btn{
     max-height: 65px;
 }
+
+.book-card-selector{
+    width: 70px;
+}
+
+.book-card-rating{
+    display: flex;
+    flex-direction: row;
+}

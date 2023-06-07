@@ -9,7 +9,7 @@ import BookingRequests from './pages/booking-requests/booking-requests';
 import Profile from './pages/profile/profile';
 import RestaurantDescription from './pages/restaurant-description/restaurant-description';
 import RequireAuth from './components/required-auth/requiredAuth';
-import { useUserQuery } from './pages/profile/profileApiSlice';
+import RestaurantBooking from './pages/restaurant-booking/restaurant-booking';
 
 
 
@@ -23,11 +23,12 @@ function App() {
         <Route path="/registration-restaurant" element={<Registration isAdmin />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<RestaurantList />}/>
-          <Route path="restaurantDescription" element={<RestaurantDescription />} />
+          <Route path="restaurantDescription/:restId" element={<RestaurantDescription />} />
           <Route element={<RequireAuth />}>
             <Route path="favourites" element={<Favourites />} />
             <Route path="booking" element={<BookingRequests />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="restaurantBooking/:restId" element={<RestaurantBooking />} />
           </Route>
         </Route>
       </Routes>

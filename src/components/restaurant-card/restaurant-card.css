@@ -1,6 +1,7 @@
 .container-card{
     width: 30%;
     margin-bottom: 10px;
+    min-width: 250px;
 }
 
 .card-button{

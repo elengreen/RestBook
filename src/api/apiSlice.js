@@ -8,6 +8,9 @@ const baseQuery = fetchBaseQuery({
         if (token) {
             headers.set("authorization", `Bearer ${token}`)
         }
+        if (!headers.has("Content-Type")){
+            headers.set("Content-Type", " application/json;odata.metadata=minimal;odata.streaming=true")
+        }
         return headers
     }
 })

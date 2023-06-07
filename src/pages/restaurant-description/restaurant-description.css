@@ -3,6 +3,10 @@
     font-size: 64px;
 }
 
+.rest-wrapper{
+    min-width: 900px;
+}
+
 .contacts-field{
     margin-bottom: 20px;
 }

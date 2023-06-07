@@ -5,9 +5,12 @@ export const restauraurantListApiSlice = apiSlice.injectEndpoints({
         getList: builder.query({
             query: () => '/api/Restaurants'
         }),
+        getRestaurantInfo: builder.query({
+            query: (id) => `/api/Restaurants/Details?id=${id}`
+        })
     })
 })
 
 export const {
-    useGetListQuery
+    useGetListQuery, useGetRestaurantInfoQuery
 } = restauraurantListApiSlice

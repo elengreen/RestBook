@@ -8,9 +8,17 @@ export const profileApiSlice = apiSlice.injectEndpoints({
         }),
         patchUser: builder.mutation({
             query: profile => ({
-                url: '/api/User',
+                url: '/api/User/EditUser',
                 method: 'PATCH',
                 body: { ...profile }
+            }),
+            invalidatesTags: ['profile']
+        }),
+        patchPassword: builder.mutation({
+            query: password => ({
+                url: '/api/User/ChangePassword',
+                method: 'PATCH',
+                body: `"${password}"`
             }),
             invalidatesTags: ['profile']
         }),
@@ -18,5 +26,5 @@ export const profileApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
-    useGetUserQuery, usePatchUserMutation
+    useGetUserQuery, usePatchUserMutation, usePatchPasswordMutation
 } = profileApiSlice

@@ -10,8 +10,10 @@ import './header.css';
 
 import profileIcon from '../../shared/profileicon.svg'
 import logOutIcon from '../../shared/logout.svg'
+import { useGetUserQuery } from '../../pages/profile/profileApiSlice.js';
 
 const Header = () => {
+    const { data: profile = null } = useGetUserQuery();
     const location = useLocation();
     const token = useSelector(selectCurrentToken);
     const dispatch = useDispatch();
@@ -35,12 +37,17 @@ const Header = () => {
     const ProfileIcon = () => {
         return (
             <>
-                <Image src={profileIcon}></Image>
+                <Image src={profileIcon} className='me-2'></Image>
+                <span>{profile.name}</span>
                 <Button className='ms-3' variant="light" onClick={exit}><Image src={logOutIcon}></Image>
                 </Button>
             </>
         )
     }
+
+    if (!profile)
+        return (<></>);
+
     return (
         <>
 

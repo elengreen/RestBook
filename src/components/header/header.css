@@ -32,3 +32,51 @@
 .login{
     margin-right:20px;
 }
+
+@media screen and (max-width: 576px) {
+    /* стили для маленьких устройств */
+    .navbar-brand {
+    font-size: 1.2rem;
+    }
+    .nav-link {
+    font-size: 0.8rem;
+    }
+    .login,.registration {
+    font-size: 0.6rem;
+    }
+    .ms-3 {
+    margin-left: 0.2rem;
+    }
+    }
+
+@media screen and (max-width: 768px) {
+    /* стили для мобильных устройств */
+    .navbar-brand {
+    font-size: 1.5rem;
+    }
+    .nav-link {
+    font-size: 1rem;
+    }
+    .login,.registration {
+    font-size: 0.8rem;
+    }
+    .ms-3 {
+    margin-left: 0.5rem;
+    }
+    }
+    
+    @media screen and (min-width: 1025px) {
+        /* стили для десктопов */
+        .navbar-brand {
+        font-size: 2rem;
+        }
+        .nav-link {
+        font-size: 1.2rem;
+        }
+        .login,.registration {
+        font-size: 1rem;
+        }
+        .ms-3 {
+        margin-left: 1rem;
+        }
+        }

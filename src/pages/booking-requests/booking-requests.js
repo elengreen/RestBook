@@ -1,6 +1,7 @@
 import React from 'react';
 import './booking-requests.css'
 import BookingRequestCard from '../../components/booking-request-card/booking-request-card';
+import BookingRequestCardArchived from '../../components/booking-request-card/booking-request-card-archived';
 
 const BookingRequests = () => {
     return (
@@ -12,6 +13,11 @@ const BookingRequests = () => {
                     <BookingRequestCard />
                     <BookingRequestCard/>
                     <BookingRequestCard/>
+                </div>
+                <h2 className='mb-4 mt-5'>История посещений</h2>
+                <div className="book-cards">
+                    <BookingRequestCardArchived />
+                    <BookingRequestCardArchived/>
                 </div>
             </div>
         </>
