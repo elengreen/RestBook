@@ -1,34 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Button, Form } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import './booking-request-card.css'
+import { Rating } from '@mui/material';
+import { usePostGradeRestaurantMutation } from '../../pages/restaurant-list/restaurantListApiSlice';
 
 
-const BookingRequestCardArchived = () => {
+const BookingRequestCardArchived = ({ isOwner, restaurant, userName, userPhoneNumber, restaurantPhoneNumber, tableNumber, claimFromDate, claimToDate, id }) => {
+    
+    const [grade] = usePostGradeRestaurantMutation();
+    const [rate, setRate] = useState(isOwner ? null : 1);
+    const [isRated, setIsRated] = useState(false);
+
+    const onRateSubmit = () => {
+        grade({restaurantId: 1, grade: rate});
+        setIsRated(true);
+    }
 
     return (
         <div className='book-card'>
             <div className='book-card-info'>
-                <span className='card-info-name'>Иван</span>
-                <span className='card-info-phone'>+79093332124</span>
+                <span className='card-info-name'>{isOwner ? userName : restaurant}</span>
+                <span className='card-info-phone'>{isOwner ? userPhoneNumber : restaurantPhoneNumber}</span>
             </div>
             <div className='book-card-info'>
-                <span>21.06.2023</span>
-                <span>16:30</span>
-                <span>Стол #7</span>
+                <span>{`${claimFromDate.getDate()}.${claimFromDate.getMonth()}.${claimFromDate.getFullYear()}`}</span>
+                <span>{`${claimFromDate.getHours()}:${claimFromDate.getMinutes()}`}-{`${claimToDate.getHours()}:${claimToDate.getMinutes()}`}</span>
+                <span>Стол #{tableNumber}</span>
             </div>
             <div className='book-card-rating'>
-            <Form.Select className='book-card-selector me-2'>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="3">4</option>
-                <option value="3">5</option>
-            </Form.Select>
-            <Button className='book-card-btn' type='submit' variant="primary" size="lg">Оценить</Button>
+                {!isRated && <>
+                    <Rating name="rating" value={rate} onClick={(e) => setRate(+e.target.defaultValue)} className='me-3' disabled={isOwner} />
+                    <Button className='book-card-btn' type='submit' onClick={() => onRateSubmit()} variant="primary" size="lg" disabled={isOwner}>Оценить</Button>
+                </>}
+                {isRated && <>
+                    <p>Спасибо за оценку!</p>
+                </>}
             </div>
-            
+
         </div>
     );
 }

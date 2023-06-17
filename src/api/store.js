@@ -8,6 +8,8 @@ export const store = configureStore({
         login: loginReducer
     },
     middleware: getDefaultMiddleware =>
-        getDefaultMiddleware().concat(apiSlice.middleware),
+        getDefaultMiddleware({
+            serializableCheck: false,
+          }).concat(apiSlice.middleware),
     devTools: true
 })

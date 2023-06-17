@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, Nav, Navbar, Image } from 'react-bootstrap'
-import { useLocation, NavLink, useNavigate } from 'react-router-dom';
+import { useLocation, NavLink, useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentToken, logOut } from '../../pages/login/loginSlice.js';
 
@@ -11,9 +11,12 @@ import './header.css';
 import profileIcon from '../../shared/profileicon.svg'
 import logOutIcon from '../../shared/logout.svg'
 import { useGetUserQuery } from '../../pages/profile/profileApiSlice.js';
+import { useGetRestaurantInfoQuery } from '../../pages/restaurant-list/restaurantListApiSlice.js';
 
 const Header = () => {
+    let { restId } = useParams();
     const { data: profile = null } = useGetUserQuery();
+    const { data: restaurant = null } = useGetRestaurantInfoQuery(restId);
     const location = useLocation();
     const token = useSelector(selectCurrentToken);
     const dispatch = useDispatch();
@@ -22,7 +25,6 @@ const Header = () => {
     const exit = () =>{
         dispatch(logOut());
         navigate('/');
-
     }
 
     const Buttons = () => {
@@ -38,15 +40,12 @@ const Header = () => {
         return (
             <>
                 <Image src={profileIcon} className='me-2'></Image>
-                <span>{profile.name}</span>
+                <span>{profile?.roles[0].name === 'Member' ? profile?.name : restaurant?.name }</span>
                 <Button className='ms-3' variant="light" onClick={exit}><Image src={logOutIcon}></Image>
                 </Button>
             </>
         )
     }
-
-    if (!profile)
-        return (<></>);
 
     return (
         <>

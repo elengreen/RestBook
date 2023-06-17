@@ -10,6 +10,8 @@ const baseQuery = fetchBaseQuery({
         }
         if (!headers.has("Content-Type")){
             headers.set("Content-Type", " application/json;odata.metadata=minimal;odata.streaming=true")
+        } else {
+            headers.delete("Content-Type");
         }
         return headers
     }

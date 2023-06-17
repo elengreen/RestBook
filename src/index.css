@@ -14,7 +14,8 @@ a {
 
 .main-header {
   margin-bottom: 40px;
-  color: #440381;
+  /* color: #440381; */
+  color: #26408B;
   font-size: 40px;
   margin-top: 40px;
 }
@@ -34,4 +35,6 @@ a {
 
 .input-error{
   color: red;
+  font-size: 0.9em;
+  overflow-wrap: normal;
 }

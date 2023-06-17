@@ -1,14 +1,23 @@
 import React from 'react';
 import { Button, Form } from 'react-bootstrap';
 import './profile.css';
-import { useGetUserQuery, usePatchPasswordMutation, usePatchUserMutation } from './profileApiSlice';
+import { useGetRestaurantQuery, useGetUserQuery, usePatchPasswordMutation, usePatchUserMutation } from './profileApiSlice';
 import { useForm } from 'react-hook-form';
+import { usePatchRestaurantInfoMutation, usePostRestaurantImageMutation, usePostRestaurantInfoMutation, usePostRestaurantMenuMutation } from '../restaurant-list/restaurantListApiSlice';
 
 const Profile = () => {
     const { data: profile = null } = useGetUserQuery();
 
+    const {
+        data: restaurant, error
+    } = useGetRestaurantQuery();
+
     const [patchUser] = usePatchUserMutation();
     const [patchPassword] = usePatchPasswordMutation();
+    const [patchRestaurantInfo] = usePatchRestaurantInfoMutation();
+    const [postRestaurantInfo] = usePostRestaurantInfoMutation();
+    const [postRestaurantImage] = usePostRestaurantImageMutation();
+    const [postRestaurantMenu] = usePostRestaurantMenuMutation();
 
     const { register: registerPasswordChange,
         getValues: getPasswordChange,
@@ -19,24 +28,40 @@ const Profile = () => {
         mode: "onChange",
     });
 
-    const { register: registerProfileChange,
-        handleSubmit: handleProfileChange,
-        formState: { errors: errorsProfileChange }
+    const { register: registerSchemeChange,
+        handleSubmit: handleSchemeChange
     } = useForm();
 
-    const { register: registerOwnerProfileChange,
-        handleSubmit: handleOwnerProfileChange,
-        formState: { errors: errorsOwnerProfileChange }
+    const { register: registerMenuChange,
+        handleSubmit: handleMenuChange
     } = useForm();
+
+    const { register: registerRestaurantCreation,
+        handleSubmit: handleRestaurantCreation,
+        formState: { errors: errorsRestaurantCreation }
+    } = useForm({
+        mode: "onChange",
+    });
 
     const onSubmitPasswordChange = async (data) => {
         resetPasswordChange();
         await patchPassword(data.password)
     };
-    const onSubmitProfileChange = async (data) => await patchUser(data);
 
-    if (!profile)
-        return (<></>);
+    const onSubmitSchemeChange = async (data) => await postRestaurantImage(data.image);
+
+    const onSubmitMenuChange = async (data) => await postRestaurantMenu(data.menu);
+
+    const onSubmitRestaurantCreation = async (data) => {
+        let openFrom = data.openFrom.split(':');
+        let openTo = data.openTo.split(':');
+        const offset = new Date().getTimezoneOffset() / 60;
+        openFrom[0] = (+openFrom[0] + offset) % 24;
+        openTo[0] = (+openTo[0] + offset) % 24;
+        data.openFrom = `${("00" + openFrom[0]).slice(-2)}:${openFrom[1]}:00`
+        data.openTo = `${("00" + openTo[0]).slice(-2)}:${openTo[1]}:00`
+        await postRestaurantInfo(data);
+    }
 
     const passwordChangeForm = () => {
         return (
@@ -46,7 +71,7 @@ const Profile = () => {
                     <Form.Group className="mb-3" controlId="password">
                         <Form.Label>Новый пароль</Form.Label>
                         <Form.Control type="password" placeholder="*******" {...registerPasswordChange("password", { required: true, minLength: 8 })} />
-                        {errorsPasswordChange.password && <span className='input-error'>Длина пароля не может быть менее 8 символов</span>}
+                        {errorsPasswordChange.password && <span className='input-error'>Минимальная длина - 8 символов</span>}
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="confirm-password">
@@ -62,6 +87,95 @@ const Profile = () => {
         )
     }
 
+    const CreateRestaurant = () => {
+        return (
+            <>
+                <h1 className='main-header'>Создайте заведение</h1>
+                <div >
+                    <Form className="profile-main d-flex flex-column" onSubmit={handleRestaurantCreation(onSubmitRestaurantCreation)}>
+                        <section className='d-flex flex-row'>
+                            <section className='profile-form d-flex flex-column align-items-left'>
+                                <Form.Group className="mb-3" controlId="admin-email" required>
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control disabled type="email" placeholder="mail@mail.com" required value={profile?.email} />
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="admin-name">
+                                    <Form.Label>Название</Form.Label>
+                                    <Form.Control placeholder="Лучший ресторан" {...registerRestaurantCreation("name", { required: true, value: restaurant?.name })} />
+                                    {errorsRestaurantCreation.name && <span className='input-error'>Необходимо ввести название</span>}
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="admin-address">
+                                    <Form.Label>Адрес</Form.Label>
+                                    <Form.Control type="address" placeholder="г. Москва, ул. Пушкина, 6" {...registerRestaurantCreation("address", { required: true, value: restaurant?.address })} />
+                                    {errorsRestaurantCreation.address && <span className='input-error'>Необходимо ввести адрес</span>}
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="admin-phone">
+                                    <Form.Label>Номер телефона</Form.Label>
+                                    <Form.Control type="tel" placeholder="+71234567890" {...registerRestaurantCreation("phoneNumber", { required: true, value: restaurant?.phoneNumber, pattern: /\+\d{11}/, maxLength: 12 })} />
+                                    {errorsRestaurantCreation.phoneNumber?.type === 'required' && <span className='input-error'>Необходимо ввести номер</span>}
+                                    {(errorsRestaurantCreation.phoneNumber?.type === 'pattern' || errorsRestaurantCreation.phoneNumber?.type === 'maxLength') && <span className='input-error'>Формат: +71234567890</span>}
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="open-from" required>
+                                    <Form.Label>Режим работы</Form.Label>
+                                    <Form.Floating className="mb-3">
+                                        <Form.Control
+                                            type="time"
+                                            {...registerRestaurantCreation("openFrom", { required: true, value: restaurant?.openFrom })} />
+                                        {errorsRestaurantCreation.openFrom && <span className='input-error'>Необходимо ввести время открытия</span>}
+                                        <label htmlFor="floatingInputCustom">Открытие в</label>
+                                    </Form.Floating>
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="open-to" required>
+                                    <Form.Floating>
+                                        <Form.Control
+                                            type="time" {...registerRestaurantCreation("openTo", { required: true, value: restaurant?.openTo })} />
+                                        {errorsRestaurantCreation.openFrom && <span className='input-error'>Необходимо ввести время закрытия</span>}
+                                        <label htmlFor="floatingInput">Закрытие в</label>
+                                    </Form.Floating>
+                                </Form.Group>
+                            </section>
+
+                            <section className='d-flex flex-column align-items-left'>
+                                <Form.Group className="mb-3" controlId="tablesCount" required>
+                                    <Form.Label>Количество столов</Form.Label>
+                                    <Form.Control type="number" placeholder="0" {...registerRestaurantCreation("tablesCount", { required: true, value: restaurant?.tablesCount, min: 1, max: 50 })} />
+                                    {errorsRestaurantCreation.tablesCount?.type === 'required' && <span className='input-error'>Необходимо ввести количество столов</span>}
+                                    {errorsRestaurantCreation.tablesCount?.type === 'min' && <span className='input-error'>Минимальное количество - 1</span>}
+                                    {errorsRestaurantCreation.tablesCount?.type === 'max' && <span className='input-error'>Максимальное количество - 50</span>}
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="description" required>
+                                    <Form.Label>Описание</Form.Label>
+                                    <Form.Control as="textarea"
+                                        placeholder="Напишите об особенностях и преимуществах вашего заведения"
+                                        style={{ height: '300px' }}
+                                        {...registerRestaurantCreation("description", { required: true, value: restaurant?.description })} />
+                                    {errorsRestaurantCreation.description && <span className='input-error'>Необходимо ввести описание</span>}
+                                </Form.Group>
+                                <Form.Label>Схема зала</Form.Label>
+                                {errorsRestaurantCreation.image && <span className='input-error mb-2'>Вы еще не загрузили схему зала</span>}
+                                <Form.Group className="mb-3" controlId="scheme" required>
+                                    <Form.Control type="file" accept="image/png, image/jpeg" {...registerRestaurantCreation("image", { required: true })} />
+                                </Form.Group>
+                                <Button className="mt-3 mb-4" variant="primary" size='lg' type="submit">
+                                    Создать
+                                </Button>
+                            </section>
+                        </section>
+                    </Form>
+
+                </div >
+            </>
+        )
+    }
+
+    const { register: registerProfileChange,
+        handleSubmit: handleProfileChange,
+        formState: { errors: errorsProfileChange }
+    } = useForm();
+
+    const onSubmitProfileChange = async (data) => await patchUser(data);
+
     const VisitorProfile = () => {
         return (
             <>
@@ -71,16 +185,15 @@ const Profile = () => {
                         <h2 className='mb-4'>Ваши данные</h2>
                         <Form.Group className="mb-3" controlId="visitor-name" >
                             <Form.Label>Имя</Form.Label>
-                            {/* <Form.Control placeholder="Иван" value={profile.name} onChange={updateName} /> */}
-                            <Form.Control placeholder="Иван" {...registerProfileChange("name", { required: true, value: profile.name })} />
+                            <Form.Control placeholder="Иван" {...registerProfileChange("name", { required: true, value: profile?.name })} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="Email" required>
                             <Form.Label>Email</Form.Label>
-                            <Form.Control disabled type="email" placeholder="mail@mail.com" {...registerProfileChange("email", { required: true, value: profile.email })} />
+                            <Form.Control disabled type="email" placeholder="mail@mail.com" {...registerProfileChange("email", { required: true, value: profile?.email })} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="visitor-phone">
                             <Form.Label>Номер телефона</Form.Label>
-                            <Form.Control type="phone" placeholder="+71234567890"  {...registerProfileChange("phone", { required: true, value: profile.phone })} />
+                            <Form.Control type="phone" placeholder="+71234567890"  {...registerProfileChange("phone", { required: true, value: profile?.phone })} />
                         </Form.Group>
                         <Button className="mt-3 mb-4" variant="primary" type="submit">
                             Сохранить
@@ -92,62 +205,104 @@ const Profile = () => {
         )
     }
 
+    const { register: registerOwnerProfileChange,
+        handleSubmit: handleOwnerProfileChange,
+        formState: { errors: errorsOwnerProfileChange }
+    } = useForm();
+
+    const onSubmitOwnerProfileChange = async (data) => {
+        let openFrom = data.openFrom.split(':');
+        let openTo = data.openTo.split(':');
+        const offset = new Date().getTimezoneOffset() / 60;
+        openFrom[0] = (+openFrom[0] + offset) % 24;
+        openTo[0] = (+openTo[0] + offset) % 24;
+        data.openFrom = `${("00" + openFrom[0]).slice(-2)}:${openFrom[1]}:00`
+        data.openTo = `${("00" + openTo[0]).slice(-2)}:${openTo[1]}:00`
+        await patchRestaurantInfo(data);
+    }
+
     const AdminProfile = () => {
+
+        if (!restaurant){
+            return <></>
+        }
+
         return (
             <>
                 <h1 className='main-header'>Профиль заведения</h1>
                 <div className="profile-main">
-                    <Form className='profile-form d-flex flex-column align-items-left'>
+                    <Form className='profile-form d-flex flex-column align-items-left' onSubmit={handleOwnerProfileChange(onSubmitOwnerProfileChange)}>
                         <h2 className='mb-4'>Данные заведения</h2>
                         <Form.Group className="mb-3" controlId="admin-email" required>
                             <Form.Label>Email</Form.Label>
-                            <Form.Control disabled type="email" placeholder="mail@mail.com" />
+                            <Form.Control disabled type="email" placeholder="mail@mail.com" required value={profile?.email} />
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="admin-name" required>
+                        <Form.Group className="mb-3" controlId="admin-name">
                             <Form.Label>Название</Form.Label>
-                            <Form.Control placeholder="Лучший ресторан" />
+                            <Form.Control placeholder="Лучший ресторан" {...registerOwnerProfileChange("name", { required: true, value: restaurant?.name })} />
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="admin-address" required>
+                        <Form.Group className="mb-3" controlId="admin-address">
                             <Form.Label>Адрес</Form.Label>
-                            <Form.Control type="address" placeholder="г. Москва, ул. Пушкина, 6" />
+                            <Form.Control type="address" placeholder="г. Москва, ул. Пушкина, 6" {...registerOwnerProfileChange("address", { required: true, value: restaurant?.address })} />
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="admin-phone" required>
+                        <Form.Group className="mb-3" controlId="admin-phone">
                             <Form.Label>Номер телефона</Form.Label>
-                            <Form.Control type="phone" placeholder="+71234567890" />
+                            <Form.Control type="phone" placeholder="+71234567890" {...registerOwnerProfileChange("phoneNumber", { required: true, value: restaurant?.phoneNumber })} />
                         </Form.Group>
-                        <Form.Group className="mb-3" controlId="working-hours" required>
+                        <Form.Group className="mb-3" controlId="open-from" required>
                             <Form.Label>Режим работы</Form.Label>
                             <Form.Floating className="mb-3">
                                 <Form.Control
-                                    id="floatingInputCustom"
-                                    type="time" />
+                                    type="time"
+                                    {...registerOwnerProfileChange("openFrom", { required: true, value: restaurant?.openFrom })} />
                                 <label htmlFor="floatingInputCustom">Открытие в</label>
                             </Form.Floating>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="open-to" required>
                             <Form.Floating>
                                 <Form.Control
-                                    id="floatingInput"
-                                    type="time" />
+                                    type="time" {...registerOwnerProfileChange("openTo", { required: true, value: restaurant?.openTo })} />
                                 <label htmlFor="floatingInput">Закрытие в</label>
                             </Form.Floating>
                         </Form.Group>
-
-                        <Form.Group className="mb-3" controlId="tables" required>
+                        <Form.Group className="mb-3" controlId="tablesCount" required>
                             <Form.Label>Количество столов</Form.Label>
-                            <Form.Control type="number" placeholder="0" />
+                            <Form.Control type="number" placeholder="0" {...registerOwnerProfileChange("tablesCount", { required: true, value: restaurant?.tablesCount })} />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="description" required>
                             <Form.Label>Описание</Form.Label>
-                            <Form.Control as="textarea" placeholder="Напишите об особенностях вашего заведения и преимуществах" style={{ height: '300px' }} />
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="tables" required>
-                            <Form.Label>Загрузите карту столов</Form.Label>
-                            <Form.Control type="file" />
+                            <Form.Control as="textarea"
+                                placeholder="Напишите об особенностях и преимуществах вашего заведения"
+                                style={{ height: '300px' }}
+                                {...registerOwnerProfileChange("description", { required: true, value: restaurant?.description })} />
                         </Form.Group>
                         <Button className="mt-3 mb-4" variant="primary" type="submit">
                             Сохранить
                         </Button>
                     </Form>
-                    {passwordChangeForm()}
+                    <section>
+                        {passwordChangeForm()}
+                        <Form className='d-flex flex-column align-items-left password-form' onSubmit={handleSchemeChange(onSubmitSchemeChange)}>
+                            <h2 className='mb-4'>Загрузите схему зала</h2>
+                            {!restaurant?.schemeImage && <span className='input-error mb-2'>Вы еще не загрузили схему зала</span>}
+                            <Form.Group className="mb-3" controlId="scheme" required>
+                                <Form.Control type="file" accept="image/png, image/jpeg" {...registerSchemeChange("image", { required: true })} />
+                            </Form.Group>
+                            <Button className="mt-3 mb-4" variant="primary" type="submit">
+                                Загрузить
+                            </Button>
+                        </Form>
+                        <Form className='d-flex flex-column align-items-left password-form' onSubmit={handleMenuChange(onSubmitMenuChange)}>
+                            <h2 className='mb-4'>Загрузите меню заведения</h2>
+                            {!restaurant?.menuPath && <span className='input-error mb-2'>Вы еще не загрузили меню</span>}
+                            <Form.Group className="mb-3" controlId="menu" required>
+                                <Form.Control type="file" accept="application/pdf" {...registerMenuChange("menu", { required: true })} />
+                            </Form.Group>
+                            <Button className="mt-3 mb-4" variant="primary" type="submit">
+                                Загрузить
+                            </Button>
+                        </Form>
+                    </section>
                 </div>
             </>
         )
@@ -155,12 +310,15 @@ const Profile = () => {
 
     let render;
 
-    if (profile.roles[0].name === 'Member') {
-        render = VisitorProfile();
-    }
-    else if (profile.roles[0].name === 'Admin') {
-        render = AdminProfile();
-
+    if (error?.status === 500) {
+        render = CreateRestaurant();
+    } else {
+        if (profile?.roles[0].name === 'Member') {
+            render = VisitorProfile();
+        }
+        else if (profile?.roles[0].name === 'Admin') {
+            render = AdminProfile();
+        }
     }
 
 

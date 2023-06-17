@@ -1,37 +1,37 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Col, Container, Form, Image, Row } from 'react-bootstrap';
 import './registration.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import rest from "../../shared/rest.svg";
 import book from "../../shared/book.svg";
+import { useForm } from 'react-hook-form';
+import { useRegistrationOwnerMutation, useRegistrationUserMutation } from './registrationApiSlice';
 
 const Registration = ({ isAdmin = false }) => {
     const regHeader = isAdmin ? 'Регистрация заведения' : 'Регистрация';
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordsMatch, setPasswordsMatch] = useState(true);
 
-    const handleEmailChange = (event) => {
-        setEmail(event.target.value);
-    };
+    const navigate = useNavigate();
 
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    };
+    const [registrationUser] = useRegistrationUserMutation();
+    const [registrationOwner] = useRegistrationOwnerMutation();
 
-    const handleConfirmPasswordChange = (event) => {
-        setConfirmPassword(event.target.value);
-        setPasswordsMatch(event.target.value === password);
-    };
+    const { register: registerRegistrationFormChange,
+        getValues: getPasswordChange,
+        handleSubmit: handleRegistrationFormChange,
+        formState: { errors: errorsRegistrationForm },
+        reset: resetRegistrationForm }
+        = useForm({
+            mode: "onChange",
+        });
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        if (passwordsMatch) {
-            console.log(`Email: ${email}, Password: ${password}`);
+    const onSubmitRegistrationForm = async (data) => {
+        resetRegistrationForm();
+        if (isAdmin) {
+            await registrationOwner(data);
         } else {
-            alert('Повторите попытку');
+            await registrationUser(data);
         }
+        navigate('/login');
     };
 
     return (
@@ -40,20 +40,21 @@ const Registration = ({ isAdmin = false }) => {
                 <Col className="restbook"><Image src={rest} /></Col>
                 <Col>
                     <h1 className="registration">{regHeader}</h1>
-                    <Form className='d-flex flex-column align-items-center' onSubmit={handleSubmit}>
+                    <Form className='d-flex flex-column align-items-center' onSubmit={handleRegistrationFormChange(onSubmitRegistrationForm)}>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" value={email} onChange={handleEmailChange} placeholder="mail@mail.com" />
+                            <Form.Control type="email" placeholder="mail@mail.com" {...registerRegistrationFormChange("email", { required: true })} />
                         </Form.Group>
 
                         <Form.Group className="mb-3" controlId='password-input'>
                             <Form.Label>Пароль</Form.Label>
-                            <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="*******" />
+                            <Form.Control type="password" placeholder="*******" {...registerRegistrationFormChange("password", { required: true, minLength: 8 })} />
+                            {errorsRegistrationForm.password && <span className='input-error'>Минимальная длина - 8 символов</span>}
                         </Form.Group>
                         <Form.Group className="mb-3" controlId='password-confirm'>
                             <Form.Label>Повторите пароль</Form.Label>
-                            <Form.Control type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} placeholder="*******" />
-                            {!passwordsMatch && <p className='input-error'>Пароли не совпадают</p>}
+                            <Form.Control type="password" placeholder="*******" {...registerRegistrationFormChange("confirmPassword", { required: true, validate: v => v === getPasswordChange("password") })} />
+                            {errorsRegistrationForm.confirmPassword && <span className='input-error'>Пароли не совпадают</span>}
                         </Form.Group>
                         <Button className="mt-3 mb-4" variant="primary" type="submit">Создать аккаунт</Button>
                         <Link to="/login">Войти в существующий аккаунт</Link>
