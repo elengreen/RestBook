@@ -7,7 +7,7 @@ import time from '../../shared/time.svg';
 import { Button, Image } from 'react-bootstrap';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetRestaurantInfoQuery } from '../restaurant-list/restaurantListApiSlice';
-import { useGetUserQuery } from '../profile/profileApiSlice';
+import { useGetRestaurantQuery, useGetUserQuery } from '../profile/profileApiSlice';
 import { useYMaps } from '@pbe/react-yandex-maps';
 
 
@@ -19,11 +19,11 @@ const RestaurantDescription = () => {
     const navigate = useNavigate();
     let { restId } = useParams();
 
-    const {
-        data: restaurant,
-    } = useGetRestaurantInfoQuery(restId);
-
+    const { data: restaurant } = useGetRestaurantInfoQuery(restId);
+    const { data: restaurantProfile } = useGetRestaurantQuery();
     const { data: profile = null } = useGetUserQuery();
+
+
 
     useEffect(() => {
         if (!ymaps || !mapRef.current || !restaurant) {
@@ -45,6 +45,8 @@ const RestaurantDescription = () => {
     if (!restaurant)
         return (<></>);
 
+    let isItOwnersRestaurant = restaurantProfile?.id == restId;
+    let isOwner = !(profile?.roles[0].name === 'Member');
     let isProfileFilledOut = true;
     for (let elem in profile) {
         if (!profile[elem]) {
@@ -53,11 +55,10 @@ const RestaurantDescription = () => {
         }
     }
     function bookingButtonOnClick() {
-        if (isProfileFilledOut)
+        if (isProfileFilledOut || isItOwnersRestaurant)
             navigate(`/restaurantBooking/${restId}`)
     }
 
-    console.log(restaurant);
     return (
         <>
             <section className="hero">
@@ -68,8 +69,10 @@ const RestaurantDescription = () => {
                     <span className='info-tables'>Свободно столов: <span className='cards-results'>{restaurant.vacantTablesCount}</span></span>
                     <span>Рейтинг: <span className='card-rating'>{restaurant.rating}</span></span>
                     <Button className="mt-4" size='lg' variant="primary" href={restaurant.menuPath} target="_blank">Меню</Button>
-                    <Button className='mt-4' size='lg' onClick={bookingButtonOnClick} disabled={!isProfileFilledOut}>Забронировать</Button>
-                    {!isProfileFilledOut && <span className='input-error'>Необходимо заполнить профиль</span>}
+                    <Button className='mt-4' size='lg' onClick={bookingButtonOnClick} disabled={(!isOwner && !isProfileFilledOut) || (isOwner && !isItOwnersRestaurant)}>Забронировать</Button>
+
+                    {(!isOwner && !isProfileFilledOut) && <span className='input-error'>Необходимо заполнить профиль</span>}
+                    {(isOwner && !isItOwnersRestaurant) && <span className='input-error'>Вы можете сделать бронь только в своем ресторане</span>}
                 </div>
                 <h2 className='main-header'>Описание</h2>
                 <p>{restaurant.description}</p>

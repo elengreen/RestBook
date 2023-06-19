@@ -126,7 +126,7 @@ export const restauraurantListApiSlice = apiSlice.injectEndpoints({
         }),
         postGradeRestaurant: builder.mutation({
             query: details => ({
-                url: '/api/Restaurant/Grade',
+                url: '/api/Restaurants/Grade',
                 method: 'POST',
                 body: {...details}
             })

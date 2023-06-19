@@ -12,8 +12,8 @@ const Registration = ({ isAdmin = false }) => {
 
     const navigate = useNavigate();
 
-    const [registrationUser] = useRegistrationUserMutation();
-    const [registrationOwner] = useRegistrationOwnerMutation();
+    const [registrationUser, { error: errorUserReg }] = useRegistrationUserMutation();
+    const [registrationOwner, { error: errorOwnerReg }] = useRegistrationOwnerMutation();
 
     const { register: registerRegistrationFormChange,
         getValues: getPasswordChange,
@@ -26,14 +26,18 @@ const Registration = ({ isAdmin = false }) => {
 
     const onSubmitRegistrationForm = async (data) => {
         resetRegistrationForm();
-        if (isAdmin) {
-            await registrationOwner(data);
-        } else {
-            await registrationUser(data);
-        }
-        navigate('/login');
+        try {
+            if (isAdmin) {
+                await registrationOwner(data).unwrap();
+            } else {
+                await registrationUser(data).unwrap();
+            }
+            navigate('/login');
+        } catch (error) { }
     };
 
+
+    console.log(errorUserReg)
     return (
         <Container>
             <Row>
@@ -41,6 +45,7 @@ const Registration = ({ isAdmin = false }) => {
                 <Col>
                     <h1 className="registration">{regHeader}</h1>
                     <Form className='d-flex flex-column align-items-center' onSubmit={handleRegistrationFormChange(onSubmitRegistrationForm)}>
+                        {((errorUserReg?.status === 500) || (errorOwnerReg?.status === 500)) && <span className='input-error mb-2'>Пользователь с таким email уже существует</span>}
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email</Form.Label>
                             <Form.Control type="email" placeholder="mail@mail.com" {...registerRegistrationFormChange("email", { required: true })} />

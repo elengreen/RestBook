@@ -10,19 +10,17 @@ import './header.css';
 
 import profileIcon from '../../shared/profileicon.svg'
 import logOutIcon from '../../shared/logout.svg'
-import { useGetUserQuery } from '../../pages/profile/profileApiSlice.js';
-import { useGetRestaurantInfoQuery } from '../../pages/restaurant-list/restaurantListApiSlice.js';
+import { useGetRestaurantQuery, useGetUserQuery } from '../../pages/profile/profileApiSlice.js';
 
 const Header = () => {
-    let { restId } = useParams();
     const { data: profile = null } = useGetUserQuery();
-    const { data: restaurant = null } = useGetRestaurantInfoQuery(restId);
+    const { data: restaurant } = useGetRestaurantQuery();
     const location = useLocation();
     const token = useSelector(selectCurrentToken);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const exit = () =>{
+    const exit = () => {
         dispatch(logOut());
         navigate('/');
     }
@@ -40,7 +38,7 @@ const Header = () => {
         return (
             <>
                 <Image src={profileIcon} className='me-2'></Image>
-                <span>{profile?.roles[0].name === 'Member' ? profile?.name : restaurant?.name }</span>
+                <span>{profile?.roles[0].name === 'Member' ? profile?.name : restaurant?.name}</span>
                 <Button className='ms-3' variant="light" onClick={exit}><Image src={logOutIcon}></Image>
                 </Button>
             </>

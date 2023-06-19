@@ -223,9 +223,11 @@ const Profile = () => {
 
     const AdminProfile = () => {
 
-        if (!restaurant){
+        if (!restaurant) {
             return <></>
         }
+        console.log(restaurant);
+
 
         return (
             <>

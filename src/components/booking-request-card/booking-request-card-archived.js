@@ -7,14 +7,14 @@ import { Rating } from '@mui/material';
 import { usePostGradeRestaurantMutation } from '../../pages/restaurant-list/restaurantListApiSlice';
 
 
-const BookingRequestCardArchived = ({ isOwner, restaurant, userName, userPhoneNumber, restaurantPhoneNumber, tableNumber, claimFromDate, claimToDate, id }) => {
+const BookingRequestCardArchived = ({ isOwner, restaurant, userName, userPhoneNumber, restaurantPhoneNumber, tableNumber, claimFromDate, claimToDate, id, restaurantId }) => {
     
     const [grade] = usePostGradeRestaurantMutation();
     const [rate, setRate] = useState(isOwner ? null : 1);
     const [isRated, setIsRated] = useState(false);
 
     const onRateSubmit = () => {
-        grade({restaurantId: 1, grade: rate});
+        grade({restaurantId: restaurantId, grade: rate, tableClaimId: id});
         setIsRated(true);
     }
 
@@ -25,7 +25,7 @@ const BookingRequestCardArchived = ({ isOwner, restaurant, userName, userPhoneNu
                 <span className='card-info-phone'>{isOwner ? userPhoneNumber : restaurantPhoneNumber}</span>
             </div>
             <div className='book-card-info'>
-                <span>{`${claimFromDate.getDate()}.${claimFromDate.getMonth()}.${claimFromDate.getFullYear()}`}</span>
+                <span>{`${claimFromDate.getDate()}.${claimFromDate.getMonth()+1}.${claimFromDate.getFullYear()}`}</span>
                 <span>{`${claimFromDate.getHours()}:${claimFromDate.getMinutes()}`}-{`${claimToDate.getHours()}:${claimToDate.getMinutes()}`}</span>
                 <span>Стол #{tableNumber}</span>
             </div>
@@ -35,7 +35,7 @@ const BookingRequestCardArchived = ({ isOwner, restaurant, userName, userPhoneNu
                     <Button className='book-card-btn' type='submit' onClick={() => onRateSubmit()} variant="primary" size="lg" disabled={isOwner}>Оценить</Button>
                 </>}
                 {isRated && <>
-                    <p>Спасибо за оценку!</p>
+                    <p  className='me-5 mt-2 ms-5'>Спасибо за оценку!</p>
                 </>}
             </div>
 

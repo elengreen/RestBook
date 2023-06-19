@@ -63,6 +63,8 @@ const RestaurantBooking = () => {
 
     let now = new Date();
 
+    
+
     return (
         <>
             <section className="hero">
