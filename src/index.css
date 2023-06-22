@@ -38,3 +38,8 @@ a {
   font-size: 0.9em;
   overflow-wrap: normal;
 }
+
+.empty-state{
+  color: #C7C4C4;
+  font-size: 50px;
+}

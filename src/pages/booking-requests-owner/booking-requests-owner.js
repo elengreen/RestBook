@@ -7,7 +7,7 @@ import { useGetBookingRequestsOwnerQuery } from './bookingRequestsOwnerApiSlice'
 const BookingRequestsOwner = () => {
 
     const {
-        data: requests,
+        data: requests, refetch
     } = useGetBookingRequestsOwnerQuery();
 
     if (!requests)
@@ -17,11 +17,12 @@ const BookingRequestsOwner = () => {
     let activeRequests = [];
 
     requests.forEach(request => {
-        if (request.isCanceled || request.isExpired)
+        if (request.isExpired)
             archivedRequests.push(<BookingRequestCardArchived key = {request.id} {...request} isOwner={true}/>)
+            else if (request.isCanceled)
+                archivedRequests.push(<BookingRequestCardArchived key = {request.id} {...request} isOwner={true} isCanceled={true}/>)
         else
-            activeRequests.push(<BookingRequestCard key = {request.id} {...request} isOwner={true} />)
-
+            activeRequests.push(<BookingRequestCard key = {request.id} {...request} isOwner={true} refetchRequests={refetch}/>)
     })
 
     return (
@@ -30,10 +31,12 @@ const BookingRequestsOwner = () => {
                 <h1 className='main-header'>Бронирование</h1>
                 <h2 className='mb-4'>Актуальные заявки</h2>
                 <div className="book-cards">
+                    {activeRequests.length===0 && <span className='empty-state'>У вас нет активных заявок</span>}
                     {activeRequests}
                 </div>
                 <h2 className='mb-4 mt-5'>История посещений</h2>
                 <div className="book-cards">
+                    {archivedRequests.length===0 && <span className='empty-state'>У вас нет заявок в архиве</span>}
                     {archivedRequests}
                 </div>
             </div>

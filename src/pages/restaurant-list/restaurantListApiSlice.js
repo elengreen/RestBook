@@ -16,21 +16,21 @@ export const restauraurantListApiSlice = apiSlice.injectEndpoints({
                 if (!data.search) {
                     if (data.filter_1)
                         if (data.filter_2)
-                            baseUrl += `&filter=rating gt ${data.filter_1} and rating lt ${data.filter_2}`
+                            baseUrl += `&filter=rating gt ${data.filter_1} and rating le ${data.filter_2}`
                         else
                             baseUrl += `&filter=rating gt ${data.filter_1}`
                     if (data.filter_2 && !data.filter_1)
                         if (data.filter_2)
-                            baseUrl += `&filter=rating lt ${data.filter_2}`
+                            baseUrl += `&filter=rating le ${data.filter_2}`
                 } else {
                     if (data.filter_1)
                         if (data.filter_2)
-                            baseUrl += ` and rating gt ${data.filter_1} and rating lt ${data.filter_2}`
+                            baseUrl += ` and rating gt ${data.filter_1} and rating le ${data.filter_2}`
                         else
                             baseUrl += ` and rating gt ${data.filter_1}`
                     if (data.filter_2 && !data.filter_1)
                         if (data.filter_2)
-                            baseUrl += ` and rating lt ${data.filter_2}`
+                            baseUrl += ` and rating le ${data.filter_2}`
                 }
 
 
@@ -89,7 +89,7 @@ export const restauraurantListApiSlice = apiSlice.injectEndpoints({
             },
             invalidatesTags: ['restaurantProfile']
         }),
-        postRestaurantImage: builder.mutation({
+        postRestaurantScheme: builder.mutation({
             query: image => {
                 const body = new FormData();
                 body.append('image', image[0]);
@@ -130,7 +130,21 @@ export const restauraurantListApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: {...details}
             })
-        })
+        }),
+        postRestaurantImage: builder.mutation({
+            query: image => {
+                const body = new FormData();
+                body.append('image', image[0]);
+
+                return {
+                    url: '/api/Restaurants/ChangeRestaurantImage',
+                    method: 'POST',
+                    headers: { "Content-Type": "multipart/form-data" },
+                    body
+                }
+            },
+            invalidatesTags: ['restaurantProfile']
+        }),
     })
 })
 
@@ -139,8 +153,9 @@ export const {
     useGetRestaurantInfoQuery,
     usePatchRestaurantInfoMutation,
     usePostRestaurantInfoMutation,
-    usePostRestaurantImageMutation,
+    usePostRestaurantSchemeMutation,
     usePostRestaurantMenuMutation,
     usePostTableClaimMutation,
-    usePostGradeRestaurantMutation
+    usePostGradeRestaurantMutation,
+    usePostRestaurantImageMutation
 } = restauraurantListApiSlice

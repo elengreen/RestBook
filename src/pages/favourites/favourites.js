@@ -20,10 +20,12 @@ const Favourites = () => {
             <RestaurantCard key={favourites.id} {...favourites} isFavourite = {true} />
         )
     })
+    console.log(favourites)
 
     return (
         <div className='main-wrapper'>
             <h1 className='main-header'>Ваши любимые заведения</h1>
+            {favourites.length===0 && <span className='empty-state'>У вас нет избранных заведений</span>}
             <div className="cards-container">
                 {favouritesCards}
             </div>

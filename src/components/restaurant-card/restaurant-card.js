@@ -9,7 +9,7 @@ import favRed from '../../shared/favred.svg';
 import cardImage from '../../shared/cardimage.png';
 import { useAddFavouriteMutation, useRemoveFavouriteMutation } from '../../pages/favourites/favouritesApiSlice';
 
-const RestaurantCard = ({ name, address, vacantTablesCount, rating, id, isFavourite, openFrom, openTo }) => {
+const RestaurantCard = ({ name, address, vacantTablesCount, rating, id, isFavourite, openFrom, openTo, restaurantImage }) => {
 
     const [addFavourite] = useAddFavouriteMutation();
     const [removeFavourite] = useRemoveFavouriteMutation();
@@ -20,14 +20,14 @@ const RestaurantCard = ({ name, address, vacantTablesCount, rating, id, isFavour
         else 
             addFavourite(id);
     }
-
+    
     openFrom = openFrom.split(':');
     openTo = openTo.split(':');
 
     return (
         <Card className='container-card'>
             <Button bsPrefix="card-button" onClick={handleFavouriteButton}><Image className='card-fav' src={isFavourite ? favRed : fav} /></Button>
-            <Card.Img variant="top" src={cardImage} />
+            <Card.Img variant="top" height={240} src={restaurantImage == null ? cardImage : restaurantImage} />
             <Card.Body>
                 <Link to={`/restaurantDescription/${id}`}>
                     <Card.Title className='card-texts'>{name}</Card.Title>

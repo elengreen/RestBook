@@ -49,7 +49,6 @@ const RestaurantList = () => {
             <RestaurantCard key={restaurant.id} {...restaurant} isFavourite={isFav} />
         )
     })
-
     return (
         <>
             <section className="hero">

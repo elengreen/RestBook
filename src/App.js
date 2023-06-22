@@ -19,7 +19,6 @@ import { YMaps } from '@pbe/react-yandex-maps';
 
 function App() {
   const { data: profile = null } = useGetUserQuery();
-
   return (
     <div className="App">
       <YMaps query={{ lang: 'ru_RU', apikey: '4dfdf3ee-ee33-4660-a1b8-30e6b9a5c34a' }}>
